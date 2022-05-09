@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[88]:
 
 
 import tkinter as tk
@@ -10,7 +10,7 @@ from tkinter import messagebox
 import tkinter.font as font #used to change the font of components
 
 
-# In[16]:
+# In[89]:
 
 
 class App(tk.Tk):
@@ -50,7 +50,7 @@ class App(tk.Tk):
         self.title("Group Finder")
 
 
-# In[17]:
+# In[90]:
 
 
 #LoginPage which is the first window frame;
@@ -61,7 +61,7 @@ class LoginPage(tk.Frame):
         border=tk.LabelFrame(self,text="Login",bg='ivory',bd=10,font=("Arial",20))
         border.pack(fill="both",expand="yes",padx=100,pady=100)
         
-        #Controlling the sent types to LoginPage from tkinterApp class;
+        #Controlling the sent types to LoginPage from App class;
         #print(type(self))
         #print(type(parent))
         #print(type(controller))
@@ -71,20 +71,22 @@ class LoginPage(tk.Frame):
             if ((E1.get() == "") or (E2.get() == "")):
                 messagebox.showerror("Empty Field", "Please fill both username and password fields")   
             else:
-                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
+                try:
+                    userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
                                "r")
-                for userinfo in userInfos:
-                    userdatas=userinfo.rstrip('\n').split("-")
-                    if(E1.get() == str(userdatas[4])) and (E2.get() == str(userdatas[5])):
-                        #L3['text'] = ("Giriş Başarılı...")
-                        messagebox.showinfo("Successful Login...", "Welcome to Group Finder")
-                        print("Welcome to Group Finder...")
-                        flag=True
-                        controller.show_frame(MainPage)
-                        clearLoginFields()
-                        break
+                    for userinfo in userInfos:
+                        userdatas=userinfo.rstrip('\n').split("-")
+                        if(E1.get() == str(userdatas[4])) and (E2.get() == str(userdatas[5])):
+                            messagebox.showinfo("Successful Login...", "Welcome to Group Finder")
+                            print("Welcome to Group Finder...")
+                            flag=True
+                            controller.show_frame(MainPage)
+                            clearLoginFields()
+                            break
+                    userInfos.close()
+                except:
+                    messagebox.showerror("An error has been occured!", "File error!") 
             if(flag==False):   
-                #L3['text'] = ("Please register at first if you do not have an account!")
                 messagebox.showerror("Non Exist User Info", "Please register at first if you do not have an account") 
         
         ##To set the entry field items later(to clear them etc.) after successful operation(Login);
@@ -122,11 +124,9 @@ class LoginPage(tk.Frame):
         def clearLoginFields():
             entry_text1.set("")
             entry_text2.set("")
-        
-        #clearLoginFields() #clear the fields when Login Page is opened -> calismiyor su an!!!!!
 
 
-# In[18]:
+# In[91]:
 
 
 #RegisterPage which is the second window frame;
@@ -143,24 +143,61 @@ class RegisterPage(tk.Frame):
             if ((E1.get() == "") or (E2.get() == "") or (E3.get() == "") or (E4.get() == "") or (E5.get() == "")):
                 messagebox.showerror("Empty Field", "All fields are required to be filled to register!")   
             else:
-                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r")
-                users = userInfos.readlines() #returns a list containing each line in the file as a list item.
-                userInfos.close()
-                id=int(users[-1].split("-")[0]) #last user's id in the file is be taken to be incremented by 1 for the next registered user to file and
-                #it is converted to int to be used for calculation
-                
-                #Opening the file again for appending after registration;
-                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "a")
-                registeredUserInfo = str(id+1) + "-" + E1.get() + "-" + E2.get() + "-" + E3.get() + "-" + E4.get() + "-" + E5.get()
-                userInfos.write(registeredUserInfo + '\n')
-                userInfos.close()
-                flag=True
+                try:
+                    if((isUsernameExists()==False) and (isSNExists()==False)):
+                        userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
+                                   "r")
+                        users = userInfos.readlines() #returns a list containing each line in the file as a list item.
+                        userInfos.close()
+                        id=int(users[-1].split("-")[0]) #last user's id in the file is be taken to be incremented by 1 for the next registered user to file and
+                        #it is converted to int to be used for calculation
+
+                        #Opening the file again for appending after registration;
+                        userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
+                                   "a")
+                        registeredUserInfo = str(id+1) + "-" + E1.get() + "-" + E2.get() + "-" + E3.get() + "-" + E4.get() + "-" + E5.get()
+                        userInfos.write(registeredUserInfo + '\n')
+                        userInfos.close()
+                        flag=True #if there is no duplication,then the flag can be assigned as True and user can register.
+                    else:
+                        messagebox.showerror("Exist user info!", "The username or/and school number exists...")   
+                        #flag will be False
+                except:
+                    messagebox.showerror("An error has been occured!", "File error!") 
             if(flag==True):
                 messagebox.showinfo("Successful Registration...", "You succesfully signed up to Group Finder...")
                 clearSignupFields()
-    
+                
+        
+        def isUsernameExists():
+            try:
+                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
+                               "r")
+                if(E4.get() in userInfos.read()): #if the file contains the username(duplicate situation)
+                    return True #entered username exists,user cannot register
+                else:
+                    return False #entered username does not exist,user can register
+            except:
+                messagebox.showerror("An error has been occured!", "File error!") 
+                
+        
+        def isSNExists(): #control school number duplication
+            flag=False
+            try:
+                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
+                               "r") 
+                for userinfo in userInfos:
+                    userdatas=userinfo.rstrip('\n').split("-")
+                    if(E3.get() == str(userdatas[3])):
+                        flag=True
+                        break #if the entered school number already exist, then break the loop to return True
+                    else:
+                        continue
+                userInfos.close()
+                return flag
+            except:
+                messagebox.showerror("An error has been occured!", "File error!") 
+            
         #To set the entry field items later(to clear them etc.) after successful operation(Registration);
         entry_text1=tk.StringVar()
         entry_text2=tk.StringVar()
@@ -203,7 +240,7 @@ class RegisterPage(tk.Frame):
 
         btnSubmit = ttk.Button(border,text ="Submit",command = register)
         btnSubmit.place(x=150,y=170)
-
+        
         def clearSignupFields():
             entry_text1.set("")
             entry_text2.set("")
@@ -212,7 +249,7 @@ class RegisterPage(tk.Frame):
             entry_text5.set("")
 
 
-# In[19]:
+# In[92]:
 
 
 #MainPage which includes the buttons to redirect the user to the related pages with respect to user choice;
@@ -241,16 +278,10 @@ class MainPage(tk.Frame):
         btnShowProfile['font'] = button_font
 
 
-# In[20]:
+# In[95]:
 
 
 app = App()
 app.maxsize(800,500)
 app.mainloop()
-
-
-# In[ ]:
-
-
-
 
