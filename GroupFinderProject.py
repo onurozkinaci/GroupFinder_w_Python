@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[94]:
+# In[73]:
 
 
 import tkinter as tk
@@ -13,7 +13,7 @@ import tkinter.font as font #used to change the font of components
 import re #To use regex for RegisterPage fields' controls
 
 
-# In[95]:
+# In[74]:
 
 
 class MainApp(tk.Tk):
@@ -37,39 +37,37 @@ class MainApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (LoginPage,RegisterPage,MainPage,ProfilePage,ActiveGroupsPage): 
+        for F in (LoginPage,RegisterPage,MainPage,ProfilePage,ActiveGroupsPage,SettingGroupPage): 
             #**sent container as the first parameter of other classes(to __init_(constructor)) will be Frame,
             #the self will be sent as 'App';
             frame = F(parent=container,controller=self)
             #initializing frame of that object from LoginPage,RegisterPage,MainPage respectively with for loop
             self.frames[F] = frame
             frame.grid(row = 0, column = 0, sticky ="nsew") #nsew=north-south-east-west,
-            #own-'grid' yerine pack kullanilirsa yalnizca kullanilan component'in alani kadar yer kaplanir.
-            #'pack()'' is limited in precision compared to place() and grid() which feature absolute positioning.
+            #If pack is used instead of grid,just the used component's field will be covered.
+            #'pack()' is limited in precision compared to place() and grid() which feature absolute positioning.
             
         self.show_frame(LoginPage)
   
-    # to display the current frame passed as
-    # parameter
+    #To display the current frame passed as parameter;
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
         self.title("Group Finder")
 
 
-# In[96]:
+# In[75]:
 
 
-##??????????????????????????????
-#To get the current logined user's id via inheriting this super class by sub classes,identify all required datas which will be used
-#by subclasses(pages) here;
+#To get the current logined user's informations such as id,fullname,school number via inheriting this super class by
+#sub classes,identify all required datas which will be used by subclasses(pages) here;
 class ParentPage:
-    loginedUserId='' #logined user's id which will be used on ProfilePage
-    loginedUserFullname=''#fullname of logined user,will be used on ProfilePage
-    loginedUserSN=''#school number  of logined user,will be used on ProfilePage
+    loginedUserId='' #logined user's id which will be used on other pages
+    loginedUserFullname=''#fullname of logined user which will be used on other pages
+    loginedUserSN=''#school number  of logined user which will be used on other pages
 
 
-# In[97]:
+# In[76]:
 
 
 #LoginPage which is the first window frame;
@@ -77,84 +75,78 @@ class LoginPage(tk.Frame,ParentPage): #???class LoginPage(tk.Frame,ParentPage):=
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
-        border=tk.LabelFrame(self,text="Login",bg='ivory',bd=10,font=("Arial",20))
-        border.pack(fill="both",expand="yes",padx=100,pady=100)
-        
-        #Controlling the sent types to LoginPage from App class;
-        #print(type(self))
-        #print(type(parent))
-        #print(type(controller))
-        
-        #self.controller=controller
-        #self.userid=controller.userid
-        
-        def login():
-            flag=False
-            if ((E1.get() == "") or (E2.get() == "")):
-                messagebox.showerror("Empty Field", "Please fill both username and password fields")   
-            else:
-                try:
-                    userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r")
-                    for userinfo in userInfos:
-                        userdatas=userinfo.rstrip('\n').split("-")
-                        if(E1.get() == str(userdatas[4])) and (E2.get() == str(userdatas[5])):
-                            messagebox.showinfo("Successful Login...", "Welcome to Group Finder")
-                            print("Welcome to Group Finder...")
-                            flag=True
-                            #Logined user's informations are assigned to common properties from inherited super class;
-                            ParentPage.loginedUserId=str(userdatas[0]) #logined user's id is taken from file to use it for 
-                            #ActiveGroups and UserProfile pages later by passing it(e.g. on MainPage-self.userid);
-                            ParentPage.loginedUserFullname=str(userdatas[1])+" "+str(userdatas[2])
-                            ParentPage.loginedUserSN=str(userdatas[3])
-                            #to control logined user;
-                            print("Logined user on Login Page: ",end='')
-                            print(ParentPage.loginedUserId,ParentPage.loginedUserFullname,ParentPage.loginedUserSN,sep="-")
-                            
-                            controller.show_frame(MainPage)
-                            clearLoginFields()
-                            break
-                    userInfos.close()
-                except:
-                    messagebox.showerror("An error has been occured!", "File error!") 
-            if(flag==False):   
-                messagebox.showerror("Non Exist User Info", "Please register at first if you do not have an account") 
-                
+        self.border=tk.LabelFrame(self,text="Login",bg='ivory',bd=10,font=("Arial",20))
+        self.border.pack(fill="both",expand="yes",padx=100,pady=100)
+        self.controller=controller
         
         ##To set the entry field items later(to clear them etc.) after successful operation(Login);
-        entry_text1=tk.StringVar()
-        entry_text2=tk.StringVar()
+        self.entry_text1=tk.StringVar()
+        self.entry_text2=tk.StringVar()
         
-        L1 = ttk.Label(border, text ="Username")
-        L1.place(x=50, y=20)
+        self.L1 = ttk.Label(self.border, text ="Username")
+        self.L1.place(x=50, y=20)
         
-        E1 = ttk.Entry(border, width=25,textvariable=entry_text1)
+        self.E1 = ttk.Entry(self.border, width=25,textvariable=self.entry_text1)
         #The Entry widget is used to display a single-line text field for accepting values from a user.
-        E1.place(x=120,y=20)
+        self.E1.place(x=120,y=20)
 
-        L2 = ttk.Label(border, text ="Password")
+        self.L2 = ttk.Label(self.border, text ="Password")
         #The Label widget is used to provide a single-line caption for other widgets. It can also contain images.
-        L2.place(x=50, y=50)
+        self.L2.place(x=50, y=50)
 
-        E2 = ttk.Entry(border,show='*', width=25,textvariable=entry_text2)
-        E2.place(x=120, y=50)
+        self.E2 = ttk.Entry(self.border,show='*', width=25,textvariable=self.entry_text2)
+        self.E2.place(x=120, y=50)
 
-        btnLogin = ttk.Button(border, text="Login",command=login) #own=>padx ve pady ile butonun x ve y duzlemindeki boyutu veriliyor.
-        #bt.grid(row = 0, column = 1, padx = 20, pady = 5)
-        btnLogin.place(x=50,y=100)
+        #The size of button in x and y coordinates is given by using padx and pady;
+        self.btnLogin = ttk.Button(self.border, text="Login",command=self.login) 
+        self.btnLogin.place(x=50,y=100)
 
-        btnRegister = ttk.Button(border, text ="Register/Signup", command = lambda : controller.show_frame(RegisterPage))
-        # putting the button in its place by using grid
-        #btnRegister.grid(row = 1, column = 1, padx = 10, pady = 10)
-        btnRegister.place(x=150,y=100)
-        entryText = tk.StringVar()
+        self.btnRegister = ttk.Button(self.border, text ="Register/Signup", command = lambda : controller.show_frame(RegisterPage))
+        self.btnRegister.place(x=150,y=100)
+        self.entryText = tk.StringVar()
+        
 
-        def clearLoginFields():
-            entry_text1.set("")
-            entry_text2.set("")
+    def login(self):
+        flag=False
+        if ((self.E1.get() == "") or (self.E2.get() == "")):
+            messagebox.showerror("Empty Field", "Please fill both username and password fields")   
+        else:
+            try:
+                userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                for userinfo in userInfos:
+                    userdatas=userinfo.rstrip('\n').split("-")
+                    if(self.E1.get() == str(userdatas[4])) and (self.E2.get() == str(userdatas[5])):
+                        messagebox.showinfo("Successful Login...", "Welcome to Group Finder")
+                        print("Welcome to Group Finder...")
+                        flag=True
+
+                        #Logined user's informations are assigned to common properties from inherited super class;
+                        ParentPage.loginedUserId=str(userdatas[0]) #logined user's id is taken from file to use it for 
+                        ParentPage.loginedUserFullname=str(userdatas[1])+" "+str(userdatas[2])
+                        ParentPage.loginedUserSN=str(userdatas[3])
+
+                        #To control logined user;
+                        print("Logined user on Login Page: ",end='')
+                        print(ParentPage.loginedUserId,ParentPage.loginedUserFullname,ParentPage.loginedUserSN,sep="-")
+
+                        self.controller.show_frame(MainPage) #the user will be redirected to MainPage after successful login.
+                        self.clearLoginFields()
+                        break
+                userInfos.close()
+
+            except:
+                messagebox.showerror("An error has been occured!", "File error!") 
+
+        if(flag==False):   
+            messagebox.showerror("Non Exist User Info", "Please register at first if you do not have an account") 
+            
+    #To clear username and password fields after successful login;
+    def clearLoginFields(self):
+        self.entry_text1.set("")
+        self.entry_text2.set("")
 
 
-# In[98]:
+# In[77]:
 
 
 #RegisterPage which is the second window frame;
@@ -163,164 +155,166 @@ class RegisterPage(tk.Frame,ParentPage):
          
         tk.Frame.__init__(self, parent)
         
-        border=tk.LabelFrame(self,text="Sign Up",bg='ivory',bd=10,font=("Arial",20))
-        border.pack(fill="both",expand="yes",padx=100,pady=100)
+        self.controller=controller
+        self.border=tk.LabelFrame(self,text="Sign Up",bg='ivory',bd=10,font=("Arial",20))
+        self.border.pack(fill="both",expand="yes",padx=100,pady=100)
         
-        def register():
-            flag=False
-            if ((E1.get() == "") or (E2.get() == "") or (E3.get() == "") or (E4.get() == "") or (E5.get() == "")):
-                messagebox.showerror("Empty Field", "All fields are required to be filled to register!")  
-                
-            elif isSNFormatApplicable()==False:
-                messagebox.showerror("Empty Field", "The school number must be a number!")   
-                
-            elif isFullnameApplicable()==False:
-                messagebox.showerror("Empty Field", "Check name and surname, correct format example: 'Mark' !")   
-                
-            elif isUnameAndPasswordApplicable()==False:
-                messagebox.showerror("Empty Field", "Check username and password, correct format example: 'mrogers123_' !") 
-                              
-            else:
-                try:
-                    if((isUsernameExists()==False) and (isSNExists()==False)):
-                        userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                                   "r")
-                        users = userInfos.readlines() #returns a list containing each line in the file as a list item.
-                        userInfos.close()
-                        
-                        #if there is no registered user in the file yet,then give first user's id as 1;
-                        if len(users)==0:
-                            id=0
-                        else:
-                            id=int(users[-1].split("-")[0]) #last user's id in the file is be taken to be incremented by 1 for the next registered user to file and
-                        #it is converted to int to be used for calculation
-
-                        #Opening the file again for appending after registration;
-                        userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                                   "a")
-                        registeredUserInfo = str(id+1) + "-" + E1.get() + "-" + E2.get() + "-" + E3.get() + "-" + E4.get() + "-" + E5.get()
-                        userInfos.write(registeredUserInfo + '\n')
-                        userInfos.close()
-                        flag=True #if there is no duplication,then the flag can be assigned as True and user can register.
-                    else:
-                        messagebox.showerror("Exist user info!", "The username or/and school number exists...")   
-                        #flag will be False
-                except:
-                    messagebox.showerror("An error has been occured!", "File error!") 
-            if(flag==True):
-                messagebox.showinfo("Successful Registration...", "You succesfully signed up to Group Finder...")
-                clearSignupFields()
-                
-        
-        def isUsernameExists():
-            try:
-                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r")
-                if(E4.get() in userInfos.read()): #if the file contains the username(duplicate situation)
-                    return True #entered username exists,user cannot register
-                else:
-                    return False #entered username does not exist,user can register
-            except:
-                messagebox.showerror("An error has been occured!", "File error!") 
-                
-        
-        def isSNExists(): #control school number duplication
-            flag=False
-            try:
-                userInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r") 
-                for userinfo in userInfos:
-                    userdatas=userinfo.rstrip('\n').split("-")
-                    if(E3.get() == str(userdatas[3])):
-                        flag=True
-                        break #if the entered school number already exist, then break the loop to return True
-                    else:
-                        continue
-                userInfos.close()
-                return flag
-            except:
-                messagebox.showerror("An error has been occured!", "File error!") 
-                
-                
-        #*To check whether entered school number matches with the regex pattern or not(must be a number(only contains digits));
-        def isSNFormatApplicable():
-            path = re.compile(r"[0-9]+[\S]")#school number must be digit and it cannot be passed as empty or with space.
-            if re.fullmatch(path,E3.get()): #"fullmatch" checks whether whole entered String matches with regex or not,re is
-                #imported at the beginning.
-                return True
-            else:
-                return False
-            
-        #*To check whether entered name and surname matches with the regex pattern or not(must be a letter);
-        def isFullnameApplicable():
-            path = re.compile(r"[A-z]+[\S]") #must be a letter and cannot be passed with space or empty
-            if (re.fullmatch(path,E1.get())) and (re.fullmatch(path,E2.get())):
-                return True
-            else:
-                return False
-            
-         #*To check whether entered username and password matches with the regex pattern or not;
-        def isUnameAndPasswordApplicable():
-            path = re.compile(r"[\w]+[\S]") #can be letter,number,_ and .(some characters) and cannot be passed with space or empty,
-            #same with [a-zA-Z0-9_]+ format.
-            if (re.fullmatch(path,E4.get())) and (re.fullmatch(path,E5.get())) :
-                return True
-            else:
-                return False
-
-                                
         #To set the entry field items later(to clear them etc.) after successful operation(Registration);
-        entry_text1=tk.StringVar()
-        entry_text2=tk.StringVar()
-        entry_text3=tk.StringVar()
-        entry_text4=tk.StringVar()
-        entry_text5=tk.StringVar()
+        self.entry_text1=tk.StringVar()
+        self.entry_text2=tk.StringVar()
+        self.entry_text3=tk.StringVar()
+        self.entry_text4=tk.StringVar()
+        self.entry_text5=tk.StringVar()
                 
-        L1 = ttk.Label(border,width=15,text ="Name")
-        L1.place(x=50, y=20)
+        self.L1 = ttk.Label(self.border,width=15,text ="Name")
+        self.L1.place(x=50, y=20)
         
-        E1 = ttk.Entry(border,width=25,textvariable=entry_text1)
-        E1.place(x=150,y=20)
+        self.E1 = ttk.Entry(self.border,width=25,textvariable=self.entry_text1)
+        self.E1.place(x=150,y=20)
         
-        L2 = ttk.Label(border,width=15,text ="Surname")
-        L2.place(x=50, y=50)
+        self.L2 = ttk.Label(self.border,width=15,text ="Surname")
+        self.L2.place(x=50, y=50)
         
-        E2 = ttk.Entry(border, width=25,textvariable=entry_text2)
-        E2.place(x=150,y=50)
+        self.E2 = ttk.Entry(self.border, width=25,textvariable=self.entry_text2)
+        self.E2.place(x=150,y=50)
         
-        L3 = ttk.Label(border,width=15,text ="School Number")
-        L3.place(x=50, y=80)
+        self.L3 = ttk.Label(self.border,width=15,text ="School Number")
+        self.L3.place(x=50, y=80)
 
-        E3 = ttk.Entry(border, width=25,textvariable=entry_text3)
-        E3.place(x=150,y=80)
+        self.E3 = ttk.Entry(self.border, width=25,textvariable=self.entry_text3)
+        self.E3.place(x=150,y=80)
         
-        L4 = ttk.Label(border,width=15,text ="Username")
-        L4.place(x=50, y=110)
+        self.L4 = ttk.Label(self.border,width=15,text ="Username")
+        self.L4.place(x=50, y=110)
 
-        E4 = ttk.Entry(border,width=25,textvariable=entry_text4)
-        E4.place(x=150, y=110)
+        self.E4 = ttk.Entry(self.border,width=25,textvariable=self.entry_text4)
+        self.E4.place(x=150, y=110)
 
-        L5 = ttk.Label(border,width=15,text ="Password")
-        L5.place(x=50, y=140)
+        self.L5 = ttk.Label(self.border,width=15,text ="Password")
+        self.L5.place(x=50, y=140)
 
-        E5 = ttk.Entry(border,show='*', width=25,textvariable=entry_text5)
-        E5.place(x=150, y=140)
+        self.E5 = ttk.Entry(self.border,show='*', width=25,textvariable=self.entry_text5)
+        self.E5.place(x=150, y=140)
 
-        btnLogin = ttk.Button(border, text="Login",command = lambda : controller.show_frame(LoginPage))
-        btnLogin.place(x=50,y=170)
+        self.btnLogin = ttk.Button(self.border, text="Login",command = lambda : controller.show_frame(LoginPage))
+        self.btnLogin.place(x=50,y=170)
 
-        btnSubmit = ttk.Button(border,text ="Submit",command = register)
-        btnSubmit.place(x=150,y=170)
+        self.btnSubmit = ttk.Button(self.border,text ="Submit",command = self.register)
+        self.btnSubmit.place(x=150,y=170)
         
-        def clearSignupFields():
-            entry_text1.set("")
-            entry_text2.set("")
-            entry_text3.set("")
-            entry_text4.set("")
-            entry_text5.set("")
+        
+    def register(self):
+        flag=False
+        if ((self.E1.get() == "") or (self.E2.get() == "") or (self.E3.get() == "") 
+               or (self.E4.get() == "") or (self.E5.get() == "")):
+            messagebox.showerror("Empty Field", "All fields are required to be filled to register!")  
+
+        elif self.isSNFormatApplicable()==False:
+            messagebox.showerror("Empty Field", "The school number must be a number!")   
+
+        elif self.isFullnameApplicable()==False:
+            messagebox.showerror("Empty Field", "Check name and surname, correct format example: 'Mark' !")   
+
+        elif self.isUnameAndPasswordApplicable()==False:
+            messagebox.showerror("Empty Field", "Check username and password, correct format example: 'mrogers123_' !") 
+
+        else:
+            try:
+                if((self.isUsernameExists()==False) and (self.isSNExists()==False)):
+                    userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                    users = userInfos.readlines() #returns a list containing each line in the file as a list item.
+                    userInfos.close()
+
+                    #if there is no registered user in the file yet,then give first user's id as 1;
+                    if len(users)==0:
+                        id=0 #will be increased by 1 below, before writing it to user file.
+                    else:
+                        id=int(users[-1].split("-")[0]) #last user's id in the file is be taken to be incremented by 1 
+                        #for the next registered user to file and it is converted to int to be used for calculation.
+
+                    #Opening the file again for appending after registration;
+                    userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","a")
+                    registeredUserInfo = str(id+1) + "-" + self.E1.get() + "-" + self.E2.get() + "-" + self.E3.get() + "-" + self.E4.get() + "-" + self.E5.get()
+                    userInfos.write(registeredUserInfo + '\n')
+                    userInfos.close()
+                    flag=True #if there is no duplication,then the flag can be assigned as True and user can register.
+
+                else:
+                    messagebox.showerror("Exist user info!", "The username or/and school number exists...")   
+                    #flag will be False
+
+            except:
+                messagebox.showerror("An error has been occured!", "File error!") 
+
+        if(flag==True):
+            messagebox.showinfo("Successful Registration...", "You succesfully signed up to Group Finder...")
+            self.clearSignupFields()
+                
+        
+    def isUsernameExists(self):
+        try:
+            userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+            if(self.E4.get() in userInfos.read()): #if the file contains the username(duplicate situation)
+                return True #entered username exists,user cannot register
+            else:
+                return False #entered username does not exist,user can register
+        except:
+            messagebox.showerror("An error has been occured!", "File error!") 
+                
+        
+    def isSNExists(self): #control school number duplication
+        flag=False
+        try:
+            userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r") 
+            for userinfo in userInfos:
+                userdatas=userinfo.rstrip('\n').split("-")
+                if(self.E3.get() == str(userdatas[3])):
+                    flag=True
+                    break #if the entered school number already exist, then break the loop to return True
+                else:
+                    continue
+            userInfos.close()
+            return flag
+        except:
+            messagebox.showerror("An error has been occured!", "File error!") 
+                
+                
+    #*To check whether entered school number matches with the regex pattern or not(must be a number(only contains digits));
+    def isSNFormatApplicable(self):
+        path = re.compile(r"[0-9]+[\S]")#school number must be digit and it cannot be passed as empty or with space.
+        if re.fullmatch(path,self.E3.get()): #"fullmatch" checks whether whole entered String matches with regex or not,re is
+            #imported at the beginning.
+            return True
+        else:
+            return False
+            
+    #*To check whether entered name and surname matches with the regex pattern or not(must be a letter);
+    def isFullnameApplicable(self):
+        path = re.compile(r"[A-z]+[\S]") #must be a letter and cannot be passed with space or empty
+        if (re.fullmatch(path,self.E1.get())) and (re.fullmatch(path,self.E2.get())):
+            return True
+        else:
+            return False
+            
+     #*To check whether entered username and password matches with the regex pattern or not;
+    def isUnameAndPasswordApplicable(self):
+        path = re.compile(r"[\w]+[\S]") #can be letter,number,_ and .(some characters) and cannot be passed with space or empty,
+        #same with [a-zA-Z0-9_]+ format.
+        if (re.fullmatch(path,self.E4.get())) and (re.fullmatch(path,self.E5.get())) :
+            return True
+        else:
+            return False
+
+    #To clear related fields after successful register;    
+    def clearSignupFields(self):
+        self.entry_text1.set("")
+        self.entry_text2.set("")
+        self.entry_text3.set("")
+        self.entry_text4.set("")
+        self.entry_text5.set("")
 
 
-# In[99]:
+# In[78]:
 
 
 #MainPage which includes the buttons to redirect the user to the related pages with respect to user choice;
@@ -331,14 +325,8 @@ class MainPage(tk.Frame,ParentPage):
         self.controller=controller
                         
         self.border=tk.LabelFrame(self,text="Main Page",bg='#1577E8',fg='#FFFFFF',bd=20,font=("Arial",20))
-        #bd used for width of frame
+        #bd is used for width of frame
         self.border.pack(fill="both",expand="yes",padx=100,pady=100)
-        
-        ##**For test purpose;
-        #This label is used for test purpose to check whether logined user id is fetched or not-will be deleted later;
-        #self.userid=tk.StringVar() #it will be assigned when the 
-        #lblUserId = tk.Label(self.border,width=15,textvariable=self.userid) #to test whether logined user id is fetched or not
-        #lblUserId.place(x=20, y=5)
         
         button_font = font.Font(family='Helvetica') #to change the font of Buttons
         
@@ -348,7 +336,8 @@ class MainPage(tk.Frame,ParentPage):
         btnCheckGroups.config(height=2,width=35)
         btnCheckGroups['font'] = button_font #to change the font of Buttons
   
-        btnSetGroup = tk.Button(self.border, text ="Set Up A Group",bg='#FFFFFF',command ="")
+        btnSetGroup = tk.Button(self.border, text ="Set Up A Group",bg='#FFFFFF',
+                                command =lambda:controller.show_frame(SettingGroupPage))
         btnSetGroup.place(x=120,y=90)
         btnSetGroup.config(height=2,width=35)
         btnSetGroup['font'] = button_font
@@ -359,55 +348,345 @@ class MainPage(tk.Frame,ParentPage):
         btnShowProfile.config(height=2,width=35)
         btnShowProfile['font'] = button_font
         
-        ##**For Test Purpose;
-        #This button will be used for a test purpose which will show whether logined user id is fetched or not;
-        #btnTestLoginedUserId=tk.Button(self.border, text ="Fetch The Id",bg='#FFFFFF',command=self.fetchLoginedUserId)
-        #btnTestLoginedUserId.place(x=80,y=210)
-        #btnTestLoginedUserId.config(height=1,width=15)
-        #btnTestLoginedUserId['font'] = button_font
-        #btnTestLoginedUserId.bind("<Button-1>",self.fetchLoginedUserId) #=>this works too with fetchLoginedUserId(self,var) method
-        
-        #This button will be used for a test purpose which will show whether logined user id is fetched or not;
-        #btnBack=tk.Button(self.border, text ="Back",bg='#FFFFFF',command = lambda:controller.show_frame(LoginPage))
-        #btnBack.place(x=10,y=5)
-        #btnBack.config(height=1,width=8)
-        #btnBack['font'] = button_font
-        
         #The user can signout and will be redirected to Login Page;
         btnSignout=tk.Button(self.border, text ="Sign Out",bg='#FFFFFF',command = lambda:controller.show_frame(LoginPage))
         btnSignout.place(x=10,y=5)
         btnSignout.config(height=1,width=8)
         btnSignout['font'] = button_font
+
+
+# In[79]:
+
+
+#Groups are created in this class;
+class SettingGroupPage(tk.Frame,ParentPage):
         
-    ##For Test Purpose;  
-    #def fetchLoginedUserId(self,var): ==>this will be used if the bind() is used;
-        #self.userid.set(ParentPage.loginedUserId)
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
         
-    ##**For Test Purpose;
-    #def fetchLoginedUserId(self):
-        #self.userid.set(ParentPage.loginedUserId)
-        #Asagidaki mantikla bir butona tiklandiginda ilgili componentleri getirecek sekilde ornegin Profil sayfasina 
-        #Profilim diye bir buton daha koyarak buna tiklaninca hem logineduserid alinacak hem de o kullaniciya ozgu componentler
-        #getirilecek
-        #lbla = tk.Label(self.border,width=15,text="Deneme") #to test whether logined user id is fetched or not
-        #lbla.place(x=30, y=200)
-       
-    #**For test purpose too;
-    #def clearMainPageFields(self):
-            #self.userid.set("")
-            #self.controller.show_frame(LoginPage)
+        self.sntest = tk.StringVar()
+        
+        self.border=tk.LabelFrame(self,text="Setting Group Page",bg='ivory',bd=10,font=("Arial",20))
+        self.border.pack(fill="both",expand="yes",padx=50,pady=50)
+        
+        self.btnTurnBack = tk.Button(self.border, text = "Back", bg='#FFFFFF', command = lambda : controller.show_frame(MainPage))
+        self.btnTurnBack.place(x=550,y=5)
+        self.btnTurnBack.config(height=1,width=12)
+        
+        self.comboboxLabel = ttk.Label(self.border,width=15,text ="Select a course")
+        self.comboboxLabel.place(x=30, y=20)
+        
+        self.selectedCourse = tk.StringVar()
+        self.courseCodeCombobox = ttk.Combobox(self.border,width=15,text ="Course Code",textvariable=self.selectedCourse)
+        self.courseCodeCombobox['values'] = ('SEN4015', 'SEN3304', 'SEN4018')
+        self.courseCodeCombobox.place(x=140, y=20)
+        self.courseCodeCombobox.config(height=2,width=15)
+        
+        self.groupMaxSizeLabel = ttk.Label(self.border,width=15,text ="Max Group Size")
+        self.groupMaxSizeLabel.place(x=30, y=50)
+        
+        self.groupMaxSizeEntryLabel = ttk.Entry(self.border, width=15)
+        self.groupMaxSizeEntryLabel.place(x=140,y=50)
+        
+        self.groupSizeLabel = ttk.Label(self.border,width=25,text ="Current Participant Count:")
+        self.groupSizeLabel.place(x=380, y=50)
+        
+        self.groupSizeEntryLabel = ttk.Entry(self.border, width=15)
+        self.groupSizeEntryLabel.place(x=550,y=50)
+        
+        self.continueLabel=ttk.Label(self.border,font="Times 13",width=58,text="You must click to Continue button if you change the components' values")
+        self.continueLabel.place(x=5,y=80)
+        
+        self.userid=tk.StringVar()
+        
+        self.createButton = tk.Button(self.border, text = "Create", bg='#FFFFFF', command = self.WritingGroupInfos)
+
+        self.continueButton = tk.Button(self.border, text = "Continue", bg='#FFFFFF', command = lambda: [self.CreatingLabels(), self.CreatingEntries(), self.OpeningCreatingButton(), self.redirectToSpecificProfile()]) 
+        self.continueButton.place(x=550,y=80)
+        self.continueButton.config(height=1,width=12)
+        
+        
+        self.myEntries = []
+        self.myLabels = []
+        self.groupMembersid = []
+        self.listToString = ""
+        self.groupStatus=""
+        self.ltest2 = []
+        self.listToStringForMembers  = ""
+        self.createdEntries = 0
+        self.createdLabels = 0
+        self.isEntriesCreated = False
+        self.isLabelsCreated = False
+        self.selectedLesson = ""
+        
+    #This method will be triggered after user clicks to Continue button;    
+    def CreatingLabels(self):
+        #The initial point of y is defined to place the components on interface in order;
+        ypoint = 130
+        if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
+            messagebox.showerror("Empty Error", "Please select course and fill all entries!")
+        elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
+            messagebox.showerror("Size Error", "Your team member count should be less than the max size")
+        elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
+            messagebox.showerror("Max Error", "Max number should be equal or less than 6, please enter again")
+        elif(int(self.groupSizeEntryLabel.get()) <= 0):
+            messagebox.showerror("Min Error", "Min number should be equal or more than 1, please enter again")
+        else:
+            if(self.isLabelsCreated == True):
+                for deletingLabels in self.myLabels:
+                    deletingLabels.destroy()
+                    
+                self.myLabels.clear()
+                
+            for j in range(1, (int(self.groupSizeEntryLabel.get()) + 1)):
+                schoolNoLabels = ttk.Label(self.border,width=15,text ="Student No " + str(j))
+                schoolNoLabels.place(x = 30, y = int(ypoint))
+                self.myLabels.append(schoolNoLabels)
+                ypoint+=30
+                
+            self.isLabelsCreated = True    
+            self.createdLabels = int(self.groupSizeEntryLabel.get())
+
+    #This method will be triggered after user clicks to Continue button;           
+    def CreatingEntries(self):
+        ypoint = 130
+
+        if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
+            return
+        elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
+            return
+        elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
+            return
+        elif(int(self.groupSizeEntryLabel.get()) <= 0):
+            return
+        else:
+            if(self.isEntriesCreated == True):
+                for deletingEntries in self.myEntries:
+                    deletingEntries.destroy()
+                    
+                self.myEntries.clear()
+                
+            for i in range(1, (int(self.groupSizeEntryLabel.get()) + 1)):
+                if i==1:
+                    schoolEntries=Entry(self.border,textvariable=self.sntest)
+                    schoolEntries.place(x=140,y=int(ypoint))
+                    self.myEntries.append(schoolEntries)
+                    ypoint+=30
+
+                else:
+                    schoolEntries=Entry(self.border)
+                    schoolEntries.place(x=140,y=int(ypoint))
+                    self.myEntries.append(schoolEntries)
+                    ypoint+=30
+                    
+            self.isEntriesCreated = True        
+            self.createdEntries = int(self.groupSizeEntryLabel.get())    
+
+    #The create label and button is created after user clicks to Continue button;
+    def OpeningCreatingButton(self):
+        if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
+            return
+        elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
+            return
+        elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
+            return
+        else:
+            self.createLabel=ttk.Label(self.border,font="Times 12",width=38,text="You must click to Create button to create a group.")
+            self.createLabel.place(x =310, y = 160)
+            self.createButton.place(x=408,y=190)
+            self.createButton.config(height=1,width=12)
+            
+    #This method will be triggered after user clicks to Continue button and fetches the logined user's informations;   
+    def redirectToSpecificProfile(self):
+        #For now, below components are created for test purpose;
+        self.userid.set(ParentPage.loginedUserId)
+        self.fullname=ParentPage.loginedUserFullname
+        self.sn=ParentPage.loginedUserSN
+        print(self.fullname,self.sn)
+        self.sntest.set(ParentPage.loginedUserSN)
+
+    #This method will be triggered after user clicks to Create button to create a group and add the infos to group file;
+    def WritingGroupInfos(self):
+        flag = False
+
+        if(self.isEntriesEmpty() == True):
+            messagebox.showerror("Error", "You must fill all entries...")
+            
+        
+        #Controlling non registered users        
+        elif (self.isUserRegistered() == False):
+            messagebox.showerror("An error has been occured!", "The user has not been registered,all users in the group must be registered first!") 
+            #clear all the text fields of myentries' items!!!!
+            #self.myEntries.clear() #removes all items of a list
+            
+        elif(self.isTeamCaptainExist() == False):
+            messagebox.showerror("An error has been occured!", "You should write your school no!") 
+            #self.myEntries.clear() #removes all items of a list
+            
+        elif(self.gettingIdFromEnteredNumber() == True):
+                messagebox.showerror("Same Number Error!","Please enter different school numbers")
+                self.groupMembersid = []
+                self.listToString = ""
+                #self.myEntries.clear()
+            
+        elif(self.isUserParticipatedBefore() == True):
+            #messagebox.showerror("Group Error!", self.listToStringForMembers + " already have a group for " + self.selectedCourse.get() + " course.")
+            messagebox.showerror("Group Error!", self.convertParticipantListToStr(self.ltest2))
+            self.ltest2 = ""
+            self.groupMembersid = []
+            self.listToString = ""
+            #self.myEntries.clear()
+
+        else:
+   
+            self.isGroupClosed() #self.groupStatus is assigned.
+            print(self.groupMembersid)
+            print(self.listToString)
+
+            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt", "r")
+            groups = groupInfos.readlines() #returns a list containing each line in the file as a list item.
+            groupInfos.close()
+
+            if(len(groups)==0):
+                self.groupid=0
+            else:
+                self.groupid=int(groups[-1].split("-")[0]) #last user's id in the file is be taken to be incremented by 1 for the next registered user to file and
+            #it is converted to int to be used for calculation
+
+            #Opening the file again for appending after registration;
+            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt", "a")
+            self.createdGroupInfo = str(self.groupid+1) + "-" + self.groupStatus +"-" + self.groupMaxSizeEntryLabel.get() + "-" + self.groupSizeEntryLabel.get() +"-"+ self.selectedCourse.get() + "-" + ParentPage.loginedUserId+ "-" + self.listToString                
+            groupInfos.write(self.createdGroupInfo + '\n')
+            groupInfos.close()
+            flag=True #if there is no duplication,then the flag can be assigned as True and user can register.
+            #Initialize values due to creation of a new group by the user
+            self.groupMembersid = []
+            self.listToString = ""
+            self.groupStatus=""
 
 
-# In[100]:
+        #messagebox.showerror("An error has been occured!", "File error!") 
+      
+        if(flag==True):
+            messagebox.showinfo("Group is created...", "Your group is created on Group Finder...")
+                     
+        
+    def isUserRegistered(self):
+        flag=False
+        
+        rfile=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+        allregusers=rfile.read()
+        
+        for val in self.myEntries:
+            if val.get() in allregusers:
+                flag=True
+                break
+        return nonRegisteredUser
+    
+    
+    def isEntriesEmpty(self):
+        emptyEntry = False
+        
+        for val in self.myEntries:
+            #Controlling empty fields
+            if (val.get() == ""):
+                emptyEntry = True
+                break
+        print(self.myEntries)
+        return emptyEntry
+    
+    def isTeamCaptainExist(self):
+        captainExist = False
+        
+        for val in self.myEntries:
+            #Controlling empty fields
+            if (val.get() == ParentPage.loginedUserSN):
+                captainExist = True
+                print(val.get(), self.sn)
+                break
+        return captainExist
+    
+    def gettingIdFromEnteredNumber(self):
+        flag = False
+        
+        participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+        for participantinfo in participantsInfos:
+            userInfo=participantinfo.rstrip('\n').split("-")
+            for participant in self.myEntries:
+      
+                if(participant.get()==str(userInfo[3])):#if the userids match to get participant's informations from user file
+                    if userInfo[0] in self.groupMembersid:
+                        flag = True
+                        return flag
+                
+                    else:
+                        self.groupMembersid.append(userInfo[0])
+        #self.listToString = ' '.join(map(str, self.groupMembersid))
+        for numberValues in self.groupMembersid:     
+            if numberValues==self.groupMembersid[-1]: #to prevent adding ',' after last item.
+                self.listToString+=numberValues
+            else:
+                self.listToString+=numberValues+","
+        participantsInfos.close()
+        return flag
+        
+    def isGroupClosed(self):
+        self.groupStatus = "OPENED"
+        if(int(self.groupSizeEntryLabel.get()) == int(self.groupMaxSizeEntryLabel.get())):
+            self.groupStatus = "CLOSED"
+            
+    #def isNumberEnteredBefore(self):
+    
+    def isUserParticipatedBefore(self): #if the logined user already have a group for the selected lecture, he/she will be 
+        #warned and cannot send a request for this lecture again(to any group unlike isRequestSentBefore()'s' work logic);
+        flag=False
+        
+        
+        for participantid in self.groupMembersid:
+            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r")
+
+            for groupinfo in groupInfos:
+                groupdatas=groupinfo.rstrip('\n').split("-")
+                if(groupdatas[4]==self.selectedCourse.get()) and (participantid in groupdatas[6]):
+                    personalInfos = open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                    for personalInfo in personalInfos:
+                        personalDatas=personalInfo.rstrip('\n').split("-")
+                        if(personalDatas[0] == participantid):
+                            print(personalDatas[3] + " has another group for " + self.selectedCourse.get())
+                            self.ltest2.append(personalDatas[3])
+                            #self.listToStringForMembers = ' '.join(map(str, self.ltest2))
+                    flag=True
+                    personalInfos.close()
+                    break
+                else:
+                    continue
+            groupInfos.close()
+        print(self.ltest2)
+        return flag
+
+        #messagebox.showerror("An error has been occured!", "File error2!")
+    
+    #This method will bring the users who already have a group for the selected lecture to give error above;
+    def convertParticipantListToStr(self,lst):
+        result=""
+        for item in lst:
+            if item==lst[-1]:
+                result+=item
+            else:
+                result+=item+","
+        result="Students "+ result + " already have a group for " + self.selectedCourse.get() + " course."
+        return result
 
 
-#Active Groups Page
+# In[80]:
+
+
+#Active Groups Page to see active groups of the selected lecture;
 class ActiveGroupsPage(tk.Frame,ParentPage): 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
         self.controller=controller
-        #self.clearFields()
         
         self.border=tk.LabelFrame(self,text="Active Group Check",bg='#1577E8',fg='#FFFFFF',bd=20,font=("Arial",18))
         #bd used for width of frame
@@ -438,13 +717,8 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         self.btnBack.config(height=1,width=8)
         self.btnBack['font'] = button_font
         
-    #after lecture selection from combobox,active groups related with this lecture will be shown on listbox in order;
+    #After lecture selection from combobox,active groups related with this lecture will be shown on listbox in order;
     def lectureSelection(self,event):
-        #print(self.currentLecture.get())    
-        #fnOfParticipants=[] #fullNames of participants
-        #idOfGroup="Group id:"
-        #currentPcOfGroup="Current Participant Count:" #current participant count of group
-        #participants="Participants:" #last version list for fullnames of participants of a group
         activeGroups=[] #a list which will store the all active groups of the related lecture
         
         self.userid=ParentPage.loginedUserId #it will be assigned when the btnMyProfile is clicked
@@ -455,21 +729,17 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
             
             #Both files will be opened before the loop to not open them many times in the loop;
             currentGroups=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") #this file is taken as an example,not original one
-            #participantsInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               #"r")
-            #participantsInfos=""
             
             for currentgroup in currentGroups:
                 groupInfo=currentgroup.rstrip('\n').split("-") #a list
                 groupParticipants=groupInfo[6].split(",") #a list,more than one user can be in the group
-                if(str(groupInfo[4])==self.selectedLecture) and (str(groupInfo[1])=="OPENED"): #related groups with selection which does not 
-                    #filled completely yet and open to requests.
-                    #Details(id,current participant count etc.) of related group will be assigned;
+                if(str(groupInfo[4])==self.selectedLecture) and (str(groupInfo[1])=="OPENED"): #related groups with selection 
+                    #which does not filled completely yet and open to requests.Details(id,current participant count etc.) of 
+                    #related group will be assigned;
                     idOfGroup=str(groupInfo[0])
-                    #currentPcOfGroup=str(groupInfo[3])
-                    fnOfParticipants=[] #to check the different group's participants by initializing it for each line if the lecture 
-                    participantsInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r")
+                    fnOfParticipants=[] #to check the different group's participants by initializing it for each line 
+                    #for the selected lecture;
+                    participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
                     for participantinfo in participantsInfos:
                         userInfo=participantinfo.rstrip('\n').split("-")
                         for participant in groupParticipants:
@@ -480,9 +750,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
                     participantsInfos.close()
 
             currentGroups.close()
-            #participantsInfos.close()
-            #print(activeGroups) #For test purpose...
-                        
+            
             self.lblDetails=tk.Label(self.border,font="Times 12",width=36,text="Active Groups For "+self.selectedLecture,
                                   bd=4)
             self.lblDetails.place(x=0,y=80)
@@ -531,7 +799,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
             selectedListItem=self.lbLectureInfos.get(self.lbLectureInfos.curselection()) #selected group from listbox
             selectedgroup=selectedListItem.split(":") #a list of selected group from listbox
             selectedgroup_id=selectedgroup[1].split(",")[0]
-             #print(selectedListItem,selectedgroup,selectedgroup_id,self.selectedLecture,self.userid,self.fullname)
+            #print(selectedListItem,selectedgroup,selectedgroup_id,self.selectedLecture,self.userid,self.fullname)
 
             groupRequests=open(r"C:\Users\Umur\Desktop\GroupRequests1.txt","a")
             if self.isUserParticipatedBefore(self.userid)==True :
@@ -549,7 +817,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         except:
             messagebox.showerror("An error has been occured!", "File error or you did not select a group or lecture") 
     
-    def isUserParticipatedBefore(self,uid): #if the logined user have already a group for selected lecture, he/she will be 
+    def isUserParticipatedBefore(self,uid): #if the logined user already have a group for selected lecture, he/she will be 
         #warned and cannot send a request for this lecture again(to any group unlike isRequestSentBefore()'s' work logic);
         flag=False
         try:
@@ -584,24 +852,43 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
             return flag
         except:
             messagebox.showerror("An error has been occured!", "File error3!")
-            
+        
+        
+    #*Clear the fields of ActiveGroupsPage and recreate them again when the user clicks to Back button and redirect 
+    #them to MainPage;
     def clearFields(self):
-        self.lblDetails.destroy()
-        self.frameLectures.destroy()
-        self.lbLectureInfos.destroy()
-        self.sbvertical.destroy()
-        self.sbhorizontal.destroy()
-        self.btnRequest.destroy()
-        self.currentLecture.set("") #to set the combobox value to unselected when the user clicks to 'Back' button.
-        #Also all the listbox elements and frame will be deleted to not leave the same listbox when new user login after signout
-        #after user clicks to 'Back' button on this page and these listbox elements will be created again when the user selects
-        #a lecture from combobox;
+        for widgets in self.border.winfo_children():#To destroy the all current components in order to get back below buttons
+        #instead of them;
+                 widgets.destroy()
+                 
+        #**Lecture Selection;
+        lblLecture=tk.Label(self.border,font="Times 12",width=30,text="Please select a lecture to see it's active groups",bd=4)
+        lblLecture.place(x=200,y=10)
+    
+        self.currentLecture = tk.StringVar()
+        cmbLectures = ttk.Combobox(self.border,width=30,textvariable=self.currentLecture) #combobox to provide lectures that the user wants
+        
+        cmbLectures['values'] = ('SEN4015', 'SEN3304', 'SEN4018')
+        cmbLectures['state'] = 'readonly' #value typing by user is prevented on combobox
+        cmbLectures.place(x=230,y=40)
+        cmbLectures.bind('<<ComboboxSelected>>',self.lectureSelection) #binding the lecture selection from combobox.'<<ComboboxSelected>>' 
+        #virtual event is created when selected value of combobox changes.We can bind this event to handle with it;
+        
+        button_font = font.Font(family='Helvetica') #to change the font of Buttons
+        
+        #This button will be used for a test purpose which will show whether logined user id is fetched or not;
+        self.btnBack=tk.Button(self.border, text ="Back",bg='#FFFFFF',command = self.clearFields)
+        self.btnBack.place(x=10,y=5)
+        self.btnBack.config(height=1,width=8)
+        self.btnBack['font'] = button_font
+        
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[101]:
+# In[81]:
 
 
+#ProfilePage to control related group informations;
 class ProfilePage(tk.Frame,ParentPage): 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -613,12 +900,11 @@ class ProfilePage(tk.Frame,ParentPage):
         self.sn="" #to assign the school number of logined user
                  
         self.border=tk.LabelFrame(self,text="Profile Page",bg='#1577E8',fg='#FFFFFF',bd=10,font=("Arial",18))
-        #bd used for width of frame
         self.border.pack(fill="both",expand="yes",padx=50,pady=50)
         
         button_font = font.Font(family='Helvetica') #to change the font of Buttons
         
-        self.btnBack1 = tk.Button(self.border, text ="Back",bg='#FFFFFF',command=self.getDestroyedComponents)
+        self.btnBack1 = tk.Button(self.border, text ="Back",bg='#FFFFFF',command=lambda:controller.show_frame(MainPage))
         self.btnBack1.place(x=10,y=5)
         self.btnBack1.config(height=1,width=8)
         self.btnBack1['font'] = button_font
@@ -732,7 +1018,7 @@ class ProfilePage(tk.Frame,ParentPage):
         self.sbhorizontal.config(command=self.lb5.xview) #xview provides to move the scrollbar horizontally
         #---------------------------------------------------------------------------------------------------------
         
-        #This button will redirect the user to Main Page
+        #This button will redirect the user to Main Page;
         btnBack=tk.Button(self.border, text ="Back",bg='#FFFFFF',command = self.getDestroyedComponents)
         btnBack.place(x=350,y=330)
         btnBack.config(height=1,width=10)
@@ -754,15 +1040,14 @@ class ProfilePage(tk.Frame,ParentPage):
             
             #Both files will be opened before the loop to not open it many times in the loop;
             usersGroups=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") #this file is taken as an example,not original one
-            participantsInfos=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt",
-                               "r")
+            participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
             
             for usergroup in usersGroups:
                 groupInfo=usergroup.rstrip('\n').split("-") #a list
                 groupParticipants=groupInfo[6].split(",") #a list,more than one user can be in the group
                 if(str(groupInfo[4])==selectedListItem) and (self.userid in groupParticipants):
-                    #Details(id,status etc.) of related group of user will be assigned before finding the relevant participant 
-                    #infos;
+                    #Details(id,status etc.) of related group of user will be assigned before finding the relevant 
+                    #participant infos;
                     idOfGroup+=str(groupInfo[0])
                     statusOfGroup+=str(groupInfo[1])
                     maxPcOfGroup+=str(groupInfo[2])
@@ -770,13 +1055,13 @@ class ProfilePage(tk.Frame,ParentPage):
                     for participantinfo in participantsInfos:
                         userInfo=participantinfo.rstrip('\n').split("-")
                         for participant in groupParticipants:
-                            if(str(userInfo[0])==participant):#if the userids match to get participant's informations from user file
+                            if(str(userInfo[0])==participant):#if the userids match to get participant's informations 
+                                #from user file;
                                 fnOfParticipants.append(str(userInfo[1])+" "+str(userInfo[2]))
             
             usersGroups.close()
             participantsInfos.close()
-            #print(fnOfParticipants) #For test purpose...  
-            
+
             lblDetails=tk.Label(self.border,font="Times 12",width=36,text="Details Of Your Related Group For Selected Lecture",
                                   bd=4)
             lblDetails.place(x=260,y=8)
@@ -809,9 +1094,6 @@ class ProfilePage(tk.Frame,ParentPage):
             
     def fillRequestNotifications(self,uid):
         try:
-                #oncelikle request dosyasi acilacak ve buradaki requestlerin group id'si alinip group dosyasina gidilecek.
-                #Son kolondan bir onceki kolon olan grubu olsuturan kisinin id'si ile login olan kisinin id'si ayni ise ona 
-                #requestler gosterilecek,diger grup uyelerine degil,onayi verecek olan onlar degil cunku;
             currentRequests=[] #a list which will store the all active groups of the related lecture    
 
             #Both files will be opened before the loop to not open it many times in the loop;
@@ -830,7 +1112,6 @@ class ProfilePage(tk.Frame,ParentPage):
                         #request infos will be taken
                 groupInfos.close()
                         
-            #print(currentRequests) 
             usersRequests.close()
             #groupInfos.close()
             
@@ -859,7 +1140,7 @@ class ProfilePage(tk.Frame,ParentPage):
             
             if self.isResponseSentBefore(selectedrequestowner_id,selectedgroup_id)==True :
                 messagebox.showerror("You have already sent a response for this group!",
-                              "You cannot send a response for this group again!")    
+                              "You cannot send a response for this user again to participate him/her to this group!")    
                 
             elif self.isGroupFull(selectedgroup_id,self.userid)==True:
                 messagebox.showerror("Max limit have reached!", 
@@ -867,7 +1148,7 @@ class ProfilePage(tk.Frame,ParentPage):
                 
             elif self.isUserParticipatedBefore(selectedlecture,selectedrequestowner_id)==True:
                 messagebox.showerror("Request owner already have a group!", 
-                                     "You cannot accept this request since request owner added for another group!")
+                                     "You cannot accept this request since request owner added for another group for this lecture!")
                 
                 
             else: #There is no problem, user can be added to response file and related group info can be updated on group file;
@@ -890,9 +1171,10 @@ class ProfilePage(tk.Frame,ParentPage):
                     if(relatedgroup[0]==selectedgroup_id) and (relatedgroup[5]==self.userid): #self.userid=logined user(group leader control)
                         changedgroup_size= int(relatedgroup[3])+1
                         if relatedgroup[2]==str(changedgroup_size):
-                            relatedgroup[1]="CLOSED" #if the max and current participant count becomes equal when new participant is added,
-                            #then the status of group will be updated as "CLOSED"!
-                        addeduserid=relatedgroup[6]+","+selectedrequestowner_id #request owner will be added to group file's last column
+                            relatedgroup[1]="CLOSED" #if the max and current participant count becomes equal when 
+                            #new participant is added, then the status of group will be updated as "CLOSED"!
+                        addeduserid=relatedgroup[6]+","+selectedrequestowner_id #request owner will be added to group 
+                        #file's last column.
                         loflines[i]=relatedgroup[0]+"-"+relatedgroup[1]+"-"+relatedgroup[2]+"-"+str(changedgroup_size)+"-"+relatedgroup[4]+"-"+relatedgroup[5]+"-"+addeduserid+'\n'
                         groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","w")
                         groupInfos.writelines(loflines)
@@ -926,7 +1208,7 @@ class ProfilePage(tk.Frame,ParentPage):
             groupResponses=open(r"C:\Users\Umur\Desktop\GroupResponses1.txt","a")
             if self.isResponseSentBefore(selectedrequestowner_id,selectedgroup_id)==True :
                 messagebox.showerror("You have already sent a response for this group!",
-                              "You cannot send a response for this group again!")                                                           
+                              "You cannot send a response for this user again to participate him/her to this group!")                                                           
             else:
                 responseinfo = selectedgroup_id+ "-" +selectedlecture+"-"+selectedrequestowner+"-"+selectedrequestowner_id+"-"+"REJECTED"
                 #fullname and user id of logined user are taken at the beginning of lectureSelection() method
@@ -1036,7 +1318,7 @@ class ProfilePage(tk.Frame,ParentPage):
                       widgets.destroy()
         
         button_font = font.Font(family='Helvetica') #to change the font of Buttons
-        self.btnBack1 = tk.Button(self.border, text ="Back",bg='#FFFFFF',command= lambda:controller.show_frame(MainPage))
+        self.btnBack1 = tk.Button(self.border, text ="Back",bg='#FFFFFF',command= lambda:self.controller.show_frame(MainPage))
         self.btnBack1.place(x=10,y=5)
         self.btnBack1.config(height=1,width=8)
         self.btnBack1['font'] = button_font
@@ -1048,7 +1330,7 @@ class ProfilePage(tk.Frame,ParentPage):
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[ ]:
+# In[82]:
 
 
 #if __name__ == '__main__':
@@ -1057,13 +1339,6 @@ app.maxsize(800,500)
 app.mainloop() #The method mainloop plays a vital role in Tkinter as it is a core application that waits for events and helps in updating 
 #the GUI or in simple terms, we can say it is event-driven programming. If no mainloop() is used then nothing will 
 #appear on the window Screen.
-
-
-# In[ ]:
-
-
-r1=open(r"C:\Users\Umur\Documents\GitHub\GroupFinderwPython\GroupFinder_w_Python\Users_SEN4015Project.txt","r")
-print(r1.readlines())
 
 
 # In[ ]:
