@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[73]:
+# In[138]:
 
 
 import tkinter as tk
@@ -13,7 +13,7 @@ import tkinter.font as font #used to change the font of components
 import re #To use regex for RegisterPage fields' controls
 
 
-# In[74]:
+# In[139]:
 
 
 class MainApp(tk.Tk):
@@ -56,7 +56,7 @@ class MainApp(tk.Tk):
         self.title("Group Finder")
 
 
-# In[75]:
+# In[140]:
 
 
 #To get the current logined user's informations such as id,fullname,school number via inheriting this super class by
@@ -67,7 +67,7 @@ class ParentPage:
     loginedUserSN=''#school number  of logined user which will be used on other pages
 
 
-# In[76]:
+# In[141]:
 
 
 #LoginPage which is the first window frame;
@@ -146,7 +146,7 @@ class LoginPage(tk.Frame,ParentPage): #???class LoginPage(tk.Frame,ParentPage):=
         self.entry_text2.set("")
 
 
-# In[77]:
+# In[142]:
 
 
 #RegisterPage which is the second window frame;
@@ -172,11 +172,19 @@ class RegisterPage(tk.Frame,ParentPage):
         self.E1 = ttk.Entry(self.border,width=25,textvariable=self.entry_text1)
         self.E1.place(x=150,y=20)
         
+        #To inform the user for the acceptable format of name;
+        self.lblNameInfo=ttk.Label(self.border,width=18,text="(e.g. 'Mark')")
+        self.lblNameInfo.place(x=320,y=20)
+        
         self.L2 = ttk.Label(self.border,width=15,text ="Surname")
         self.L2.place(x=50, y=50)
         
         self.E2 = ttk.Entry(self.border, width=25,textvariable=self.entry_text2)
         self.E2.place(x=150,y=50)
+        
+        #To inform the user for the acceptable format of surname;
+        self.lblSurnameInfo=ttk.Label(self.border,width=18,text="(e.g. 'Rogers')")
+        self.lblSurnameInfo.place(x=320,y=50)
         
         self.L3 = ttk.Label(self.border,width=15,text ="School Number")
         self.L3.place(x=50, y=80)
@@ -184,17 +192,29 @@ class RegisterPage(tk.Frame,ParentPage):
         self.E3 = ttk.Entry(self.border, width=25,textvariable=self.entry_text3)
         self.E3.place(x=150,y=80)
         
+        #To inform the user for the acceptable format of school number;
+        self.lblSNInfo=ttk.Label(self.border,width=18,text="(e.g. '1803694')") #exactly 7 digits,will be controleld with regex
+        self.lblSNInfo.place(x=320,y=80)
+        
         self.L4 = ttk.Label(self.border,width=15,text ="Username")
         self.L4.place(x=50, y=110)
 
         self.E4 = ttk.Entry(self.border,width=25,textvariable=self.entry_text4)
         self.E4.place(x=150, y=110)
+        
+        #To inform the user for the acceptable format of username;
+        self.lblUsernameInfo=ttk.Label(self.border,width=18,text="(e.g. 'm_rogers')")
+        self.lblUsernameInfo.place(x=320,y=110)
 
         self.L5 = ttk.Label(self.border,width=15,text ="Password")
         self.L5.place(x=50, y=140)
 
         self.E5 = ttk.Entry(self.border,show='*', width=25,textvariable=self.entry_text5)
         self.E5.place(x=150, y=140)
+        
+        #To inform the user for the acceptable format of password;
+        self.lblPasswordInfo=ttk.Label(self.border,width=18,text="(e.g. 'mrogers123_')")
+        self.lblPasswordInfo.place(x=320,y=140)
 
         self.btnLogin = ttk.Button(self.border, text="Login",command = lambda : controller.show_frame(LoginPage))
         self.btnLogin.place(x=50,y=170)
@@ -210,7 +230,7 @@ class RegisterPage(tk.Frame,ParentPage):
             messagebox.showerror("Empty Field", "All fields are required to be filled to register!")  
 
         elif self.isSNFormatApplicable()==False:
-            messagebox.showerror("Empty Field", "The school number must be a number!")   
+            messagebox.showerror("Empty Field", "The school number must be 7 digits!")   
 
         elif self.isFullnameApplicable()==False:
             messagebox.showerror("Empty Field", "Check name and surname, correct format example: 'Mark' !")   
@@ -281,7 +301,7 @@ class RegisterPage(tk.Frame,ParentPage):
                 
     #*To check whether entered school number matches with the regex pattern or not(must be a number(only contains digits));
     def isSNFormatApplicable(self):
-        path = re.compile(r"[0-9]+[\S]")#school number must be digit and it cannot be passed as empty or with space.
+        path = re.compile(r"[0-9]{7}")#school number must be digit and it cannot be passed as empty or with space.
         if re.fullmatch(path,self.E3.get()): #"fullmatch" checks whether whole entered String matches with regex or not,re is
             #imported at the beginning.
             return True
@@ -314,7 +334,7 @@ class RegisterPage(tk.Frame,ParentPage):
         self.entry_text5.set("")
 
 
-# In[78]:
+# In[143]:
 
 
 #MainPage which includes the buttons to redirect the user to the related pages with respect to user choice;
@@ -355,7 +375,7 @@ class MainPage(tk.Frame,ParentPage):
         btnSignout['font'] = button_font
 
 
-# In[79]:
+# In[144]:
 
 
 #Groups are created in this class;
@@ -369,7 +389,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
         self.border=tk.LabelFrame(self,text="Setting Group Page",bg='ivory',bd=10,font=("Arial",20))
         self.border.pack(fill="both",expand="yes",padx=50,pady=50)
         
-        self.btnTurnBack = tk.Button(self.border, text = "Back", bg='#FFFFFF', command = lambda : controller.show_frame(MainPage))
+        self.btnTurnBack = tk.Button(self.border, text = "Back", bg='#FFFFFF', command = lambda : [controller.show_frame(MainPage), self.clearingFields()])
         self.btnTurnBack.place(x=550,y=5)
         self.btnTurnBack.config(height=1,width=12)
         
@@ -385,26 +405,28 @@ class SettingGroupPage(tk.Frame,ParentPage):
         self.groupMaxSizeLabel = ttk.Label(self.border,width=15,text ="Max Group Size")
         self.groupMaxSizeLabel.place(x=30, y=50)
         
-        self.groupMaxSizeEntryLabel = ttk.Entry(self.border, width=15)
+        self.groupMaxSizeEntry = tk.StringVar()
+        self.groupMaxSizeEntryLabel = ttk.Entry(self.border, width=15, textvariable = self.groupMaxSizeEntry)
         self.groupMaxSizeEntryLabel.place(x=140,y=50)
         
         self.groupSizeLabel = ttk.Label(self.border,width=25,text ="Current Participant Count:")
         self.groupSizeLabel.place(x=380, y=50)
         
-        self.groupSizeEntryLabel = ttk.Entry(self.border, width=15)
+        self.groupSizeEntry = tk.StringVar()
+        self.groupSizeEntryLabel = ttk.Entry(self.border, width=15, textvariable = self.groupSizeEntry)
         self.groupSizeEntryLabel.place(x=550,y=50)
         
         self.continueLabel=ttk.Label(self.border,font="Times 13",width=58,text="You must click to Continue button if you change the components' values")
         self.continueLabel.place(x=5,y=80)
         
         self.userid=tk.StringVar()
-        
-        self.createButton = tk.Button(self.border, text = "Create", bg='#FFFFFF', command = self.WritingGroupInfos)
 
         self.continueButton = tk.Button(self.border, text = "Continue", bg='#FFFFFF', command = lambda: [self.CreatingLabels(), self.CreatingEntries(), self.OpeningCreatingButton(), self.redirectToSpecificProfile()]) 
         self.continueButton.place(x=550,y=80)
         self.continueButton.config(height=1,width=12)
         
+        self.createLabel=ttk.Label(self.border,font="Times 12",width=38,text="You must click to Create button to create a group.")
+        self.createButton = tk.Button(self.border, text = "Create", bg='#FFFFFF', command = self.WritingGroupInfos)
         
         self.myEntries = []
         self.myLabels = []
@@ -418,6 +440,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
         self.isEntriesCreated = False
         self.isLabelsCreated = False
         self.selectedLesson = ""
+        self.isContinueButtonClicked = False
         
     #This method will be triggered after user clicks to Continue button;    
     def CreatingLabels(self):
@@ -491,8 +514,12 @@ class SettingGroupPage(tk.Frame,ParentPage):
         elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
             return
         else:
-            self.createLabel=ttk.Label(self.border,font="Times 12",width=38,text="You must click to Create button to create a group.")
-            self.createLabel.place(x =310, y = 160)
+            if(self.isContinueButtonClicked == False):
+                self.createLabel=ttk.Label(self.border,font="Times 12",width=38,text="You must click to Create button to create a group.")
+                self.createButton = tk.Button(self.border, text = "Create", bg='#FFFFFF', command = self.WritingGroupInfos)
+                self.isContinueButtonClicked = True
+                
+            self.createLabel.place(x = 310, y = 160)
             self.createButton.place(x=408,y=190)
             self.createButton.config(height=1,width=12)
             
@@ -510,8 +537,10 @@ class SettingGroupPage(tk.Frame,ParentPage):
         flag = False
 
         if(self.isEntriesEmpty() == True):
-            messagebox.showerror("Error", "You must fill all entries...")
+            messagebox.showerror("Empty Error", "You must fill all entries...")
             
+        elif (self.isSNFormatApplicable() == False): #Regex control
+            messagebox.showerror("Wrong Notation Error", "The school numbers must be 7 digits!")
         
         #Controlling non registered users        
         elif (self.isUserRegistered() == False):
@@ -532,7 +561,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
         elif(self.isUserParticipatedBefore() == True):
             #messagebox.showerror("Group Error!", self.listToStringForMembers + " already have a group for " + self.selectedCourse.get() + " course.")
             messagebox.showerror("Group Error!", self.convertParticipantListToStr(self.ltest2))
-            self.ltest2 = ""
+            self.ltest2 = []
             self.groupMembersid = []
             self.listToString = ""
             #self.myEntries.clear()
@@ -572,16 +601,16 @@ class SettingGroupPage(tk.Frame,ParentPage):
                      
         
     def isUserRegistered(self):
-        flag=False
+        flag=True
         
         rfile=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
         allregusers=rfile.read()
         
         for val in self.myEntries:
-            if val.get() in allregusers:
-                flag=True
+            if val.get() not in allregusers:
+                flag = False
                 break
-        return nonRegisteredUser
+        return flag
     
     
     def isEntriesEmpty(self):
@@ -676,9 +705,48 @@ class SettingGroupPage(tk.Frame,ParentPage):
                 result+=item+","
         result="Students "+ result + " already have a group for " + self.selectedCourse.get() + " course."
         return result
+    
+    
+    #Regex control for entered school numbers by user to add the participants to a created group; 
+    def isSNFormatApplicable(self):
+        flag=True
+        path = re.compile(r"[0-9]{7}")#school number must be digit and it cannot be passed as empty or with space.
+        for val in self.myEntries: 
+            if re.fullmatch(path,val.get()): #"fullmatch" checks whether whole entered String matches with regex or not,re is
+                #imported at the beginning.
+                continue #even one of the entries is not in the applicable format,then break the loop and return False to give an error.
+            else:
+                flag=False
+                break
+        return flag
+    
+    
+    def clearingFields(self):
+        
+        if(self.isEntriesCreated == True and self.isLabelsCreated == True):
+            for deletingEntries in self.myEntries:
+                deletingEntries.destroy()
+                
+            self.myEntries.clear()
+            self.createdEntries = 0
+                
+            for deletingLabels in self.myLabels:
+                deletingLabels.destroy()
+
+            self.myLabels.clear()
+            self.createdLabels = 0
+            self.createLabel.destroy()
+            self.createButton.destroy()
+            
+        self.isLabelsCreated = False
+        self.isEntriesCreated = False
+        self.isContinueButtonClicked = False
+        self.selectedCourse.set("")
+        self.groupSizeEntry.set("")
+        self.groupMaxSizeEntry.set("")
 
 
-# In[80]:
+# In[145]:
 
 
 #Active Groups Page to see active groups of the selected lecture;
@@ -885,7 +953,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[81]:
+# In[146]:
 
 
 #ProfilePage to control related group informations;
@@ -1330,7 +1398,7 @@ class ProfilePage(tk.Frame,ParentPage):
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[82]:
+# In[148]:
 
 
 #if __name__ == '__main__':
