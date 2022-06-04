@@ -45,7 +45,6 @@ class MainApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row = 0, column = 0, sticky ="nsew") #nsew=north-south-east-west,
             #If pack is used instead of grid,just the used component's field will be covered.
-            #'pack()' is limited in precision compared to place() and grid() which feature absolute positioning.
             
         self.show_frame(LoginPage)
   
@@ -91,7 +90,7 @@ class LoginPage(tk.Frame,ParentPage): #???class LoginPage(tk.Frame,ParentPage):=
         self.E1.place(x=120,y=20)
 
         self.L2 = ttk.Label(self.border, text ="Password")
-        #The Label widget is used to provide a single-line caption for other widgets. It can also contain images.
+        
         self.L2.place(x=50, y=50)
 
         self.E2 = ttk.Entry(self.border,show='*', width=25,textvariable=self.entry_text2)
@@ -112,7 +111,7 @@ class LoginPage(tk.Frame,ParentPage): #???class LoginPage(tk.Frame,ParentPage):=
             messagebox.showerror("Empty Field", "Please fill both username and password fields")   
         else:
             try:
-                userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                userInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
                 for userinfo in userInfos:
                     userdatas=userinfo.rstrip('\n').split("-")
                     if(self.E1.get() == str(userdatas[4])) and (self.E2.get() == str(userdatas[5])):
@@ -241,7 +240,7 @@ class RegisterPage(tk.Frame,ParentPage):
         else:
             try:
                 if((self.isUsernameExists()==False) and (self.isSNExists()==False)):
-                    userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                    userInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
                     users = userInfos.readlines() #returns a list containing each line in the file as a list item.
                     userInfos.close()
 
@@ -253,7 +252,7 @@ class RegisterPage(tk.Frame,ParentPage):
                         #for the next registered user to file and it is converted to int to be used for calculation.
 
                     #Opening the file again for appending after registration;
-                    userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","a")
+                    userInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","a")
                     registeredUserInfo = str(id+1) + "-" + self.E1.get() + "-" + self.E2.get() + "-" + self.E3.get() + "-" + self.E4.get() + "-" + self.E5.get()
                     userInfos.write(registeredUserInfo + '\n')
                     userInfos.close()
@@ -273,7 +272,7 @@ class RegisterPage(tk.Frame,ParentPage):
         
     def isUsernameExists(self):
         try:
-            userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+            userInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
             if(self.E4.get() in userInfos.read()): #if the file contains the username(duplicate situation)
                 return True #entered username exists,user cannot register
             else:
@@ -285,7 +284,7 @@ class RegisterPage(tk.Frame,ParentPage):
     def isSNExists(self): #control school number duplication
         flag=False
         try:
-            userInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r") 
+            userInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r") 
             for userinfo in userInfos:
                 userdatas=userinfo.rstrip('\n').split("-")
                 if(self.E3.get() == str(userdatas[3])):
@@ -808,7 +807,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
             self.selectedLecture=self.currentLecture.get() #the selected lecture from combobox
             
             #Both files will be opened before the loop to not open them many times in the loop;
-            currentGroups=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") #this file is taken as an example,not original one
+            currentGroups=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r") #this file is taken as an example,not original one
             
             for currentgroup in currentGroups:
                 groupInfo=currentgroup.rstrip('\n').split("-") #a list
@@ -819,7 +818,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
                     idOfGroup=str(groupInfo[0])
                     fnOfParticipants=[] #to check the different group's participants by initializing it for each line 
                     #for the selected lecture;
-                    participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                    participantsInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
                     for participantinfo in participantsInfos:
                         userInfo=participantinfo.rstrip('\n').split("-")
                         for participant in groupParticipants:
@@ -881,7 +880,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
             selectedgroup_id=selectedgroup[1].split(",")[0]
             #print(selectedListItem,selectedgroup,selectedgroup_id,self.selectedLecture,self.userid,self.fullname)
 
-            groupRequests=open(r"C:\Users\Umur\Desktop\GroupRequests1.txt","a")
+            groupRequests=open(r"D:\PROJECTS\SEN4015_Project\GroupRequests1.txt","a")
             if self.isUserParticipatedBefore(self.userid)==True :
                 messagebox.showerror("You already have a group for this lecture!",
                                      "You cannot send a request for this lecture again!")                
@@ -901,7 +900,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         #warned and cannot send a request for this lecture again(to any group unlike isRequestSentBefore()'s' work logic);
         flag=False
         try:
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") 
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r") 
             for groupinfo in groupInfos:
                 groupdatas=groupinfo.rstrip('\n').split("-")
                 if(groupdatas[4]==self.selectedLecture) and (uid in groupdatas[6]):
@@ -920,7 +919,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         #group for the same lecture(selected lecture);
         flag=False
         try:
-            groupRequests=open(r"C:\Users\Umur\Desktop\GroupRequests1.txt","r") 
+            groupRequests=open(r"D:\PROJECTS\SEN4015_Project\GroupRequests1.txt","r") 
             for grouprequest in groupRequests:
                 groupdatas=grouprequest.rstrip('\n').split("-")
                 if(groupdatas[0]==gid) and (groupdatas[3]==uid):
@@ -1119,8 +1118,8 @@ class ProfilePage(tk.Frame,ParentPage):
             #assigned for multiple selection, then a for loop would be required to get the selected list items.
             
             #Both files will be opened before the loop to not open it many times in the loop;
-            usersGroups=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") #this file is taken as an example,not original one
-            participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+            usersGroups=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r") #this file is taken as an example,not original one
+            participantsInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
             
             for usergroup in usersGroups:
                 groupInfo=usergroup.rstrip('\n').split("-") #a list
@@ -1177,13 +1176,13 @@ class ProfilePage(tk.Frame,ParentPage):
             currentRequests=[] #a list which will store the all active groups of the related lecture    
 
             #Both files will be opened before the loop to not open it many times in the loop;
-            usersRequests=open(r"C:\Users\Umur\Desktop\GroupRequests1.txt","r")
-            #groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r")
+            usersRequests=open(r"D:\PROJECTS\SEN4015_Project\GroupRequests1.txt","r")
+            #groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r")
             #groupInfos="" #it will be assigned as a file in the loop
             
             for userrequest in usersRequests:
                 requestInfo=userrequest.rstrip('\n').split("-") #a list 
-                groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r")
+                groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r")
                 for groupinfo in groupInfos:
                     groupdata=groupinfo.rstrip('\n').split("-") #a list
                     if(str(requestInfo[0])==str(groupdata[0])) and (str(groupdata[5])==uid): 
@@ -1215,8 +1214,8 @@ class ProfilePage(tk.Frame,ParentPage):
             selectedrequestowner_id=selectedgroup[4]
             #print(selectedgroup,selectedgroup_id,selectedlecture,selectedrequestowner,selectedrequestowner_id)
             
-            groupResponses=open(r"C:\Users\Umur\Desktop\GroupResponses1.txt","a")
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","a")
+            groupResponses=open(r"D:\PROJECTS\SEN4015_Project\GroupResponses1.txt","a")
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","a")
             
             if self.isResponseSentBefore(selectedrequestowner_id,selectedgroup_id)==True :
                 messagebox.showerror("You have already sent a response for this group!",
@@ -1241,7 +1240,7 @@ class ProfilePage(tk.Frame,ParentPage):
                 #-------------------------------Updating Related Group File-----------------------------------------------------
                 #**Updating related group infos on groups' file if it is accepted by group leader.Whole file(write again) 
                 #need to be updated even if one line of it need to be changed as below;
-                groupInfos = open(r"C:\Users\Umur\Desktop\GroupInfos.txt", "r")
+                groupInfos = open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt", "r")
                 loflines = groupInfos.readlines() #a list which holds the lines of opened text
                 flag=False #to check whether the file is updated or not 
                     
@@ -1256,7 +1255,7 @@ class ProfilePage(tk.Frame,ParentPage):
                         addeduserid=relatedgroup[6]+","+selectedrequestowner_id #request owner will be added to group 
                         #file's last column.
                         loflines[i]=relatedgroup[0]+"-"+relatedgroup[1]+"-"+relatedgroup[2]+"-"+str(changedgroup_size)+"-"+relatedgroup[4]+"-"+relatedgroup[5]+"-"+addeduserid+'\n'
-                        groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","w")
+                        groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","w")
                         groupInfos.writelines(loflines)
                         groupInfos.close()
                         flag=True
@@ -1285,7 +1284,7 @@ class ProfilePage(tk.Frame,ParentPage):
             selectedrequestowner_id=selectedgroup[4]
             #print(selectedgroup,selectedgroup_id,selectedlecture,selectedrequestowner,selectedrequestowner_id)
             
-            groupResponses=open(r"C:\Users\Umur\Desktop\GroupResponses1.txt","a")
+            groupResponses=open(r"D:\PROJECTS\SEN4015_Project\GroupResponses1.txt","a")
             if self.isResponseSentBefore(selectedrequestowner_id,selectedgroup_id)==True :
                 messagebox.showerror("You have already sent a response for this group!",
                               "You cannot send a response for this user again to participate him/her to this group!")                                                           
@@ -1305,7 +1304,7 @@ class ProfilePage(tk.Frame,ParentPage):
         #group for the same lecture(selected lecture);
         flag=False
         try:
-            groupResponses=open(r"C:\Users\Umur\Desktop\GroupResponses1.txt","r") 
+            groupResponses=open(r"D:\PROJECTS\SEN4015_Project\GroupResponses1.txt","r") 
             for groupresponse in groupResponses:
                 groupdatas=groupresponse.rstrip('\n').split("-")
                 if(groupdatas[0]==gid) and (groupdatas[3]==uid):
@@ -1323,7 +1322,7 @@ class ProfilePage(tk.Frame,ParentPage):
             currentResponses=[] #a list which will store the all active groups of the related lecture    
 
             #Both files will be opened before the loop to not open it many times in the loop;
-            responseInfos=open(r"C:\Users\Umur\Desktop\GroupResponses1.txt","r")
+            responseInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupResponses1.txt","r")
             
             for responseinfo in responseInfos:
                 response=responseinfo.rstrip('\n').split("-") #a list 
@@ -1350,7 +1349,7 @@ class ProfilePage(tk.Frame,ParentPage):
     def isGroupFull(self,gid,uid):
         flag=False
         try:
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r")
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r")
             for groupinfo in groupInfos:
                 relatedgroup=groupinfo.rstrip('\n').split("-")
                 if(relatedgroup[0]==gid) and (relatedgroup[5]==uid):
@@ -1373,7 +1372,7 @@ class ProfilePage(tk.Frame,ParentPage):
     def isUserParticipatedBefore(self,slecture,uid):
         flag=False
         try:
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r") 
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r") 
             for groupinfo in groupInfos:
                 groupdatas=groupinfo.rstrip('\n').split("-")
                 if(groupdatas[4]==slecture) and (uid in groupdatas[6]):
@@ -1416,9 +1415,7 @@ class ProfilePage(tk.Frame,ParentPage):
 #if __name__ == '__main__':
 app=MainApp()
 app.maxsize(800,500)
-app.mainloop() #The method mainloop plays a vital role in Tkinter as it is a core application that waits for events and helps in updating 
-#the GUI or in simple terms, we can say it is event-driven programming. If no mainloop() is used then nothing will 
-#appear on the window Screen.
+app.mainloop()
 
 
 # In[ ]:
