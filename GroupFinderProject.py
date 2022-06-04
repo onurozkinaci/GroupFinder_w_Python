@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[138]:
+# In[1]:
 
 
 import tkinter as tk
@@ -13,7 +13,7 @@ import tkinter.font as font #used to change the font of components
 import re #To use regex for RegisterPage fields' controls
 
 
-# In[139]:
+# In[2]:
 
 
 class MainApp(tk.Tk):
@@ -56,7 +56,7 @@ class MainApp(tk.Tk):
         self.title("Group Finder")
 
 
-# In[140]:
+# In[3]:
 
 
 #To get the current logined user's informations such as id,fullname,school number via inheriting this super class by
@@ -67,7 +67,7 @@ class ParentPage:
     loginedUserSN=''#school number  of logined user which will be used on other pages
 
 
-# In[141]:
+# In[4]:
 
 
 #LoginPage which is the first window frame;
@@ -146,7 +146,7 @@ class LoginPage(tk.Frame,ParentPage): #???class LoginPage(tk.Frame,ParentPage):=
         self.entry_text2.set("")
 
 
-# In[142]:
+# In[5]:
 
 
 #RegisterPage which is the second window frame;
@@ -334,7 +334,7 @@ class RegisterPage(tk.Frame,ParentPage):
         self.entry_text5.set("")
 
 
-# In[143]:
+# In[6]:
 
 
 #MainPage which includes the buttons to redirect the user to the related pages with respect to user choice;
@@ -375,7 +375,7 @@ class MainPage(tk.Frame,ParentPage):
         btnSignout['font'] = button_font
 
 
-# In[144]:
+# In[7]:
 
 
 #Groups are created in this class;
@@ -448,12 +448,14 @@ class SettingGroupPage(tk.Frame,ParentPage):
         ypoint = 130
         if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
             messagebox.showerror("Empty Error", "Please select course and fill all entries!")
+        elif(self.isEntriesEnteredCorrect() == False):
+            messagebox.showerror("Typing Error", "Please fill entries with integers.")
+        elif(int(self.groupSizeEntryLabel.get()) <= 0) or (int(self.groupMaxSizeEntryLabel.get()) <= 0):
+            messagebox.showerror("Min Error", "Min number should be equal or more than 1, please enter again")
         elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
             messagebox.showerror("Size Error", "Your team member count should be less than the max size")
         elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
-            messagebox.showerror("Max Error", "Max number should be equal or less than 6, please enter again")
-        elif(int(self.groupSizeEntryLabel.get()) <= 0):
-            messagebox.showerror("Min Error", "Min number should be equal or more than 1, please enter again")
+            messagebox.showerror("Max Error", "Max number should be equal or less than 6, please enter again")        
         else:
             if(self.isLabelsCreated == True):
                 for deletingLabels in self.myLabels:
@@ -476,12 +478,14 @@ class SettingGroupPage(tk.Frame,ParentPage):
 
         if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
             return
+        elif(self.isEntriesEnteredCorrect() == False):
+            return
+        elif(int(self.groupSizeEntryLabel.get()) <= 0 or int(self.groupMaxSizeEntryLabel.get()) <= 0):
+            return
         elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
             return
         elif(int(self.groupMaxSizeEntryLabel.get()) >= 7 ):
-            return
-        elif(int(self.groupSizeEntryLabel.get()) <= 0):
-            return
+            return  
         else:
             if(self.isEntriesCreated == True):
                 for deletingEntries in self.myEntries:
@@ -508,6 +512,10 @@ class SettingGroupPage(tk.Frame,ParentPage):
     #The create label and button is created after user clicks to Continue button;
     def OpeningCreatingButton(self):
         if(self.selectedCourse.get() == "" or self.groupMaxSizeEntryLabel.get() == "" or  self.groupSizeEntryLabel.get() == ""):
+            return
+        elif(self.isEntriesEnteredCorrect() == False):
+            return
+        elif(int(self.groupSizeEntryLabel.get()) <= 0 or int(self.groupMaxSizeEntryLabel.get()) <= 0):
             return
         elif(int(self.groupSizeEntryLabel.get()) > int(self.groupMaxSizeEntryLabel.get())):
             return
@@ -539,8 +547,8 @@ class SettingGroupPage(tk.Frame,ParentPage):
         if(self.isEntriesEmpty() == True):
             messagebox.showerror("Empty Error", "You must fill all entries...")
             
-        elif (self.isSNFormatApplicable() == False): #Regex control
-            messagebox.showerror("Wrong Notation Error", "The school numbers must be 7 digits!")
+        elif (self.isSNFormatApplicable() == False):
+            messagebox.showerror("Wrong Notation Error", "The school number must be 7 digits!")
         
         #Controlling non registered users        
         elif (self.isUserRegistered() == False):
@@ -572,7 +580,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
             print(self.groupMembersid)
             print(self.listToString)
 
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt", "r")
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt", "r")
             groups = groupInfos.readlines() #returns a list containing each line in the file as a list item.
             groupInfos.close()
 
@@ -583,7 +591,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
             #it is converted to int to be used for calculation
 
             #Opening the file again for appending after registration;
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt", "a")
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt", "a")
             self.createdGroupInfo = str(self.groupid+1) + "-" + self.groupStatus +"-" + self.groupMaxSizeEntryLabel.get() + "-" + self.groupSizeEntryLabel.get() +"-"+ self.selectedCourse.get() + "-" + ParentPage.loginedUserId+ "-" + self.listToString                
             groupInfos.write(self.createdGroupInfo + '\n')
             groupInfos.close()
@@ -603,7 +611,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
     def isUserRegistered(self):
         flag=True
         
-        rfile=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+        rfile=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
         allregusers=rfile.read()
         
         for val in self.myEntries:
@@ -638,7 +646,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
     def gettingIdFromEnteredNumber(self):
         flag = False
         
-        participantsInfos=open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+        participantsInfos=open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
         for participantinfo in participantsInfos:
             userInfo=participantinfo.rstrip('\n').split("-")
             for participant in self.myEntries:
@@ -672,12 +680,12 @@ class SettingGroupPage(tk.Frame,ParentPage):
         
         
         for participantid in self.groupMembersid:
-            groupInfos=open(r"C:\Users\Umur\Desktop\GroupInfos.txt","r")
+            groupInfos=open(r"D:\PROJECTS\SEN4015_Project\GroupInfos.txt","r")
 
             for groupinfo in groupInfos:
                 groupdatas=groupinfo.rstrip('\n').split("-")
                 if(groupdatas[4]==self.selectedCourse.get()) and (participantid in groupdatas[6]):
-                    personalInfos = open(r"C:\Users\Umur\Desktop\Users_SEN4015Project.txt","r")
+                    personalInfos = open(r"D:\PROJECTS\SEN4015_Project\Users_SEN4015Project.txt","r")
                     for personalInfo in personalInfos:
                         personalDatas=personalInfo.rstrip('\n').split("-")
                         if(personalDatas[0] == participantid):
@@ -706,21 +714,25 @@ class SettingGroupPage(tk.Frame,ParentPage):
         result="Students "+ result + " already have a group for " + self.selectedCourse.get() + " course."
         return result
     
-    
-    #Regex control for entered school numbers by user to add the participants to a created group; 
     def isSNFormatApplicable(self):
-        flag=True
+        flag = True
         path = re.compile(r"[0-9]{7}")#school number must be digit and it cannot be passed as empty or with space.
         for val in self.myEntries: 
             if re.fullmatch(path,val.get()): #"fullmatch" checks whether whole entered String matches with regex or not,re is
                 #imported at the beginning.
-                continue #even one of the entries is not in the applicable format,then break the loop and return False to give an error.
+                continue
             else:
-                flag=False
+                flag = False
                 break
         return flag
     
-    
+    def isEntriesEnteredCorrect(self):
+        path = re.compile(r"[0-9]")
+        if((re.fullmatch(path, self.groupMaxSizeEntryLabel.get())) and (re.fullmatch(path, self.groupSizeEntryLabel.get()))):
+            return True
+        else:
+            return False
+                       
     def clearingFields(self):
         
         if(self.isEntriesCreated == True and self.isLabelsCreated == True):
@@ -746,7 +758,7 @@ class SettingGroupPage(tk.Frame,ParentPage):
         self.groupMaxSizeEntry.set("")
 
 
-# In[145]:
+# In[8]:
 
 
 #Active Groups Page to see active groups of the selected lecture;
@@ -953,7 +965,7 @@ class ActiveGroupsPage(tk.Frame,ParentPage):
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[146]:
+# In[9]:
 
 
 #ProfilePage to control related group informations;
@@ -1398,7 +1410,7 @@ class ProfilePage(tk.Frame,ParentPage):
         self.controller.show_frame(MainPage) #redirect the user to MainPage when he/she clicks to 'Back' button
 
 
-# In[148]:
+# In[10]:
 
 
 #if __name__ == '__main__':
